@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!--
+Copyright 2025 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IBC x Google Hackfest Video.js Player</title>
+    <!-- Link to the Video.js CSS file from a CDN for styling -->
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <h1>IBC x Google Hackfest Video.js Stream Player</h1>
+        
+        <div class="input-container">
+            <!-- Text input for the video stream URL -->
+            <input type="text" id="video-source-input" placeholder="Enter video stream URL (e.g., .m3u8, .mpd, .mp4)">
+            <!-- Button to load the video into the player -->
+            <button id="load-video-btn">Load</button>
+        </div>
+
+        <div class="video-container">
+            <!-- The video element that Video.js will use -->
+            <!-- We use 'fluid' to make it responsive -->
+            <video
+                id="my-video"
+                class="video-js vjs-big-play-centered vjs-fluid"
+                controls
+                preload="auto"
+                width="640"
+                height="360"
+                data-setup="{}"
+            >
+                <p class="vjs-no-js">
+                    To view this video please enable JavaScript, and consider upgrading to a
+                    web browser that
+                    <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+                </p>
+            </video>
+        </div>
+        
+        <p class="info-text">
+            Enter a valid video URL. Supported formats include HLS (.m3u8), DASH (.mpd), and MP4.
+        </p>
+    </div>
+
+    <!-- Link to the Video.js JavaScript file -->
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
+    <!-- Link to our custom JavaScript file using Flask's url_for helper -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

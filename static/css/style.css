@@ -1,0 +1,92 @@
+/* General body styling for a clean look */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f0f2f5;
+    color: #1c1e21;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Main container for the app */
+.container {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+/* Header styling */
+h1 {
+    color: #1877f2;
+    margin-bottom: 1.5rem;
+}
+
+/* Input controls container */
+.input-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+}
+
+/* Styling for the text input field */
+#video-source-input {
+    flex-grow: 1; /* Allows the input to take up available space */
+    padding: 12px;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+    font-size: 16px;
+    min-width: 200px; /* Ensures input is usable on small screens */
+}
+
+#video-source-input:focus {
+    outline: none;
+    border-color: #1877f2;
+    box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+}
+
+/* Styling for the load button */
+#load-video-btn {
+    padding: 12px 20px;
+    background-color: #1877f2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#load-video-btn:hover {
+    background-color: #166fe5;
+}
+
+/* Styling for the video player container */
+.video-container {
+    width: 100%;
+    background-color: #000;
+    border-radius: 8px;
+    overflow: hidden; /* Ensures player corners are rounded */
+}
+
+/* Responsive Video.js player */
+.video-js {
+    width: 100% !important; /* Overrides default inline styles */
+    height: auto !important; /* Ensures aspect ratio is maintained */
+}
+
+/* Informational text */
+.info-text {
+    margin-top: 1.5rem;
+    color: #606770;
+    font-size: 14px;
+}
