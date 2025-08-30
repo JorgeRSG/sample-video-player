@@ -13,9 +13,41 @@
 // limitations under the License.
 
 document.addEventListener('DOMContentLoaded', function() {
-            
-    // Get references to the HTML elements
-    const player = videojs('my-video'); // Initialize Video.js on our video element
+    
+    // First, try to get a reference to an existing player
+    let player = videojs.getPlayer('my-video');
+
+    // Check if the player has NOT been initialized yet
+    if (!player) {
+        // If no player exists, initialize it now WITH ALL YOUR OPTIONS
+        player = videojs('my-video', {
+            controls: true,
+            autoplay: false,
+            preload: 'auto',
+            fluid: true,
+            playbackRates: [0.5, 1, 1.5, 2],
+            html5: {
+                vhs: {
+                    overrideNative: true,
+                },
+                nativeAudioTracks: false,
+                nativeVideoTracks: false,
+            },
+            plugins: {
+                // Enable the unified quality selector
+                hlsQualitySelector: {
+                    displayCurrentQuality: true,
+                }
+            }
+
+        });
+        console.log("Player initialized successfully!");
+    } else {
+        console.log("Player was already initialized.");
+    }
+
+
+
     const loadButton = document.getElementById('load-video-btn');
     const sourceInput = document.getElementById('video-source-input');
 
