@@ -18,7 +18,8 @@ limitations under the License.
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IBC x Google Hackfest Video.js Player</title>
+    <title>IBC x Google Cloud Hackfest Video.js Player</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='/images/play_icon.png') }}">
     <!-- Link to the Video.js CSS file from a CDN for styling -->
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@2.0.0/dist/videojs-hls-quality-selector.min.css">
@@ -53,6 +54,7 @@ limitations under the License.
                     <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
                 </p>
             </video>
+            <div id="ad-ui"></div>
         </div>
         
         <p class="info-text">
@@ -65,6 +67,8 @@ limitations under the License.
 
     <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-dash/dist/videojs-dash.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@2.0.0/dist/videojs-hls-quality-selector.min.js"></script>
+    <!-- Link to the IMA DAI SDK -->
+    <script src="//imasdk.googleapis.com/js/sdkloader/ima3_dai.js"></script>
     <!-- Link to our custom JavaScript file using Flask's url_for helper -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     

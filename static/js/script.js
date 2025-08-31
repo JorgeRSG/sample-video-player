@@ -12,99 +12,105 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // First, try to get a reference to an existing player
-    let player = videojs.getPlayer('my-video');
+function initPlayer() {
+  var player = videojs('my-video');
+  var PROJECT_NUMBER = '669648730623';
+  var REGION = 'europe-west1';
+  var NETWORK_CODE = '6353';
+  var LIVE_STREAM_EVENT_ID = 'testchampart'
+  var CUSTOM_ASSET_KEY = '669648730623-europe-west1-testchampart';
 
-    // Check if the player has NOT been initialized yet
-    if (!player) {
-        // If no player exists, initialize it now WITH ALL YOUR OPTIONS
-        player = videojs('my-video', {
-            controls: true,
-            autoplay: false,
-            preload: 'auto',
-            fluid: true,
-            playbackRates: [0.5, 1, 1.5, 2],
-            html5: {
-                vhs: {
-                    overrideNative: true,
-                },
-                nativeAudioTracks: false,
-                nativeVideoTracks: false,
-            },
-            plugins: {
-                // Enable the unified quality selector
-                hlsQualitySelector: {
-                    displayCurrentQuality: true,
-                }
-            }
+  var BACKUP_STREAM = 'https://storage.googleapis.com/testtopbox-public/video_content/bbb_cropped/playlist.m3u8';
 
+  var videoElement = document.getElementsByTagName('video')[0];
+  var streamManager = new google.ima.dai.api.StreamManager(videoElement);
+  var clickElement = document.getElementById('ad-ui');
+  streamManager.setClickElement(clickElement);
+  streamManager.addEventListener([
+      google.ima.dai.api.StreamEvent.Type.LOADED,
+      google.ima.dai.api.StreamEvent.Type.ERROR,
+      google.ima.dai.api.StreamEvent.Type.AD_BREAK_STARTED,
+      google.ima.dai.api.StreamEvent.Type.STARTED,
+      google.ima.dai.api.StreamEvent.Type.FIRST_QUARTILE,
+      google.ima.dai.api.StreamEvent.Type.MIDPOINT,
+      google.ima.dai.api.StreamEvent.Type.THIRD_QUARTILE,
+      google.ima.dai.api.StreamEvent.Type.COMPLETE,
+      google.ima.dai.api.StreamEvent.Type.AD_BREAK_ENDED
+  ], function(event){
+    switch (event.type) {
+      case 'loaded': 
+        console.log("stream ready to start => " + event.getStreamData().url);
+        console.log("DAI session: " + event.getStreamData().streamId);
+        // listen to ID3 tags and pass them to IMA for ad tracking
+        player.textTracks().on('addtrack', function (e) {
+          // find out if the new track is metadata
+          var track = e.track;
+          if (track.kind === 'metadata') {
+            // a cuechange event fires when the player crosses over an ID3 tag
+            track.on('cuechange', function () {
+              let elemTrack = track.activeCues[0];
+              if (elemTrack && elemTrack.value.data) {
+                var metadata = {};
+                metadata[elemTrack.value.key] = elemTrack.value.data;
+                metadata["duration"] = Infinity;
+                streamManager.onTimedMetadata(metadata);
+              }
+            });
+          }
         });
-        console.log("Player initialized successfully!");
-    } else {
-        console.log("Player was already initialized.");
+
+        player.width(720); 
+        player.height(480);
+        player.src(event.getStreamData().url);
+        // Start playback. This may be blocked by browser autoplay policies
+        // if there hasn't been a user interaction yet.
+        player.play().catch(function(error) {
+          console.log('Playback was prevented:', error);
+        });
+      break;
+      
+      case 'error':
+        console.log("Error => play fallback: " + BACKUP_STREAM);
+        player.src(BACKUP_STREAM);
+        //player.play();
+      break;
+      
+    case 'adBreakStarted':
+      console.log("ad break started => display ad ui element");
+      clickElement.style.display = 'block';
+    break;
+    
+    case 'adBreakEnded':
+      console.log("ad break ended => hide ad ui element");
+      clickElement.style.display = 'none';
+    break;
+    
+    case 'started':
+      console.log("ima event: " + event.type + " (" + event.getAd().getAdId() + ")");
+    break;
+    
+    default:
+      console.log("ima event: " + event.type);
+    break;
     }
+  }, false);
 
+  var loadButton = document.getElementById('load-video-btn');
+  loadButton.addEventListener('click', function() {
+    // Request Live Stream
+    var streamRequest = new google.ima.dai.api.VideoStitcherLiveStreamRequest();
+    streamRequest.projectNumber = PROJECT_NUMBER;
+    streamRequest.customAssetKey = CUSTOM_ASSET_KEY;
+    streamRequest.apiKey = '';
+    streamRequest.format = 'hls';
+    streamRequest.networkCode = NETWORK_CODE;
+    streamRequest.liveStreamEventId = LIVE_STREAM_EVENT_ID;
+    streamRequest.region = REGION;
+    streamRequest.oAuthToken = TOKEN;
+    streamManager.requestStream(streamRequest);
+  });
+}
 
-
-    const loadButton = document.getElementById('load-video-btn');
-    const sourceInput = document.getElementById('video-source-input');
-
-    // --- Function to load a new video source ---
-    const loadVideo = () => {
-        const sourceUrl = sourceInput.value.trim(); // Get URL from input and remove whitespace
-        
-        // Check if a URL was actually entered
-        if (!sourceUrl) {
-            alert("Please enter a video source URL.");
-            return;
-        }
-        
-        // Heuristic to determine the video MIME type based on file extension
-        let sourceType = '';
-        if (sourceUrl.endsWith('.m3u8')) {
-            sourceType = 'application/x-mpegURL'; // HLS
-        } else if (sourceUrl.endsWith('.mpd')) {
-            sourceType = 'application/dash+xml'; // DASH
-        } else if (sourceUrl.endsWith('.mp4')) {
-            sourceType = 'video/mp4'; // MP4
-        } else {
-            // If the type is unknown, we let Video.js try to figure it out.
-            // This might not always work, but it's a good fallback.
-            console.warn("Could not determine video type from URL. Letting Video.js guess.");
-        }
-
-        console.log(`Loading source: ${sourceUrl}`);
-        console.log(`Detected type: ${sourceType || 'auto'}`);
-
-        // Set the new source on the player
-        player.src({
-            src: sourceUrl,
-            type: sourceType
-        });
-
-        // Load the new source and attempt to play it
-        player.load();
-        player.play().catch(error => {
-            // Catch and log any errors that occur during playback attempt (e.g., autoplay restrictions)
-            console.error("Playback was prevented:", error);
-        });
-    };
-
-    // --- Event Listeners ---
-    
-    // Add a click event listener to the load button
-    loadButton.addEventListener('click', loadVideo);
-    
-    // Optional: Allow pressing 'Enter' in the input field to load the video
-    sourceInput.addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent default form submission behavior
-            loadVideo();
-        }
-    });
-    
-    // Pre-fill the input with a sample stream for demonstration
-    sourceInput.value = 'https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8';
+document.addEventListener('DOMContentLoaded', function() {
+  initPlayer();
 });
