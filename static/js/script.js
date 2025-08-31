@@ -21,7 +21,6 @@ function initPlayer() {
   var CUSTOM_ASSET_KEY = '669648730623-europe-west1-testchampart';
 
   var BACKUP_STREAM = 'https://storage.googleapis.com/testtopbox-public/video_content/bbb_cropped/playlist.m3u8';
-
   var videoElement = document.getElementsByTagName('video')[0];
   var streamManager = new google.ima.dai.api.StreamManager(videoElement);
   var clickElement = document.getElementById('ad-ui');
@@ -95,8 +94,11 @@ function initPlayer() {
     }
   }, false);
 
+  console.log("Ready to request a live stream from the Video Stitcher API");
   var loadButton = document.getElementById('load-video-btn');
   loadButton.addEventListener('click', function() {
+    var tokenInput = document.getElementById('auth-token');
+    var userProvidedToken = tokenInput.value;
     // Request Live Stream
     var streamRequest = new google.ima.dai.api.VideoStitcherLiveStreamRequest();
     streamRequest.projectNumber = PROJECT_NUMBER;
@@ -106,7 +108,7 @@ function initPlayer() {
     streamRequest.networkCode = NETWORK_CODE;
     streamRequest.liveStreamEventId = LIVE_STREAM_EVENT_ID;
     streamRequest.region = REGION;
-    streamRequest.oAuthToken = TOKEN;
+    streamRequest.oAuthToken = userProvidedToken;
     streamManager.requestStream(streamRequest);
   });
 }
